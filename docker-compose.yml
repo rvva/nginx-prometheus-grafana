@@ -1,0 +1,114 @@
+version: '3.7'
+services:
+  nginx:
+    build:
+      context: ./nginx 
+      target: dev
+    image: nginx:1.21.3-alpine
+    container_name: nginx-www
+    restart: always
+    volumes: 
+      - ./html:/usr/share/nginx/html:rw
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx/log:/var/log/nginx
+    networks:
+      - localhost
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+
+  # source https://prometheus.io/docs/prometheus/latest/installation/
+  prometheus:
+    image: prom/prometheus:v2.30.2
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      # chown -Rc 65534:65534 data folder first
+      - ./prometheus/data:/prometheus
+    container_name: prometheus
+    restart: always
+    networks:
+      - localhost
+    ports:
+      - 9090:9090
+
+# source https://github.com/nginxinc/nginx-prometheus-exporter
+  nginx-prometheus-exporter:
+    image: nginx/nginx-prometheus-exporter:0.9.0
+    container_name: prometheus-nginx-exporter
+    restart: always
+    env_file:
+      .env
+    command:
+      - -nginx.scrape-uri=http://${DOCKER_BRIDGE_IP_ADDRESS}:8080/stub_status
+    expose: 
+      - 9113
+    networks:
+      - localhost
+    depends_on:
+      - prometheus
+
+  # source https://github.com/prometheus/node_exporter  
+  # https://github.com/vegasbrianc/prometheus/
+  prometheus-node-exporter:
+    image: prom/node-exporter:v1.2.2
+    container_name: prometheus-node-exporter
+    restart: always
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command: 
+      - '--path.procfs=/host/proc' 
+      - '--path.sysfs=/host/sys'
+      - --collector.filesystem.ignored-mount-points
+      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+    networks:
+      - localhost
+    privileged: true
+    depends_on:
+      - prometheus
+    expose:
+      - 9100
+
+  # source https://grafana.com/docs/grafana/latest/installation/docker/
+  grafana:
+    image: grafana/grafana:8.1.5
+    container_name: grafana
+    user: '472:0'
+    restart: always
+    depends_on:
+      - prometheus
+    volumes:
+      # chown 472:0 -Rc grafana folder first 
+      - ./grafana/data:/var/lib/grafana
+    env_file:
+      - .env
+    networks:
+      - localhost
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+  
+  # source: https://github.com/google/cadvisor 
+  cadvisor:
+    image: google/cadvisor:latest
+    container_name: cadvisor
+    restart: always
+    depends_on:
+      - prometheus
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    expose:
+      - 8080
+    networks:
+      - localhost
+
+networks:
+    localhost:
+        name: localhost
+        external: false
