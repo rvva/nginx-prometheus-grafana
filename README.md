@@ -1,4 +1,4 @@
-# Nginx, Prometheus and Grafana with Docker Engine
+# Nginx, Prometheus and Grafana with docker-compose!
 
 It's a simple example, template of usage stack Nginx, Prometheus (Node Exporter, Nginx Exporter, Cadvisor) and Grafana.
 
