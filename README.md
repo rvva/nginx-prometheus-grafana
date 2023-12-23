@@ -22,9 +22,6 @@ sudo chown -Rc 65534:65534 nginx-prometheus-grafana/prometheus/data
 </pre>
 4. Configure .env file 
 
-Before runing containers check .env file and verify that <i>DOCKER_BRIDGE_IP_ADDRESS</i> is the same as yours.
-You can check that using command:
-<pre>docker network inspect bridge | grep Gateway</pre>
 Modify <i>GF_SECURITY_ADMIN</i> parameters to set your personal Grafana credentials. 
 
 5. Run it!
@@ -34,7 +31,7 @@ docker-compose up -d
 
 ### III. Post installation steps
 1. Login into Grafana localhost:3000 and add Data Source -> Prometheus. 
-2. As url address use DOCKER_BRIDGE_IP_ADDRESS:9090. 
+2. As url address use `http://prometheus:9090` 
 3. Add dashboards. I recommend you:
 * for nginx: https://grafana.com/grafana/dashboards/12708
 * for cadvisor: https://grafana.com/grafana/dashboards/13946
