@@ -14,7 +14,8 @@ It's a simple example, template of usage stack Nginx, Prometheus (Node Exporter,
 1. Clone repository to your working directory:
 <pre>https://github.com/rvva/nginx-prometheus-grafana/</pre>
 2. Create Prometheus and Grafana data directory:
-<pre>mkdir -p nginx-prometheus-grafana/{prometheus,grafana}/data</pre>
+<pre>mkdir -p nginx-prometheus-grafana/{prometheus,grafana}/data
+mkdir nginx-prometheus-grafana/nginx/log</pre>
 3. Change files permissions:
 <pre>
 sudo chown 472:0 -Rc nginx-prometheus-grafana/grafana/data
