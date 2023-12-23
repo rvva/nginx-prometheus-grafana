@@ -4,7 +4,7 @@ services:
     build:
       context: ./nginx 
       target: dev
-    image: nginx:1.21.3-alpine
+    image: nginx:1.25.3-alpine3.18
     container_name: nginx-www
     restart: always
     volumes: 
@@ -16,11 +16,10 @@ services:
     ports:
       - 80:80
       - 443:443
-      - 8080:8080
 
   # source https://prometheus.io/docs/prometheus/latest/installation/
   prometheus:
-    image: prom/prometheus:v2.30.2
+    image: prom/prometheus:v2.45.2
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       # chown -Rc 65534:65534 data folder first
@@ -34,13 +33,13 @@ services:
 
 # source https://github.com/nginxinc/nginx-prometheus-exporter
   nginx-prometheus-exporter:
-    image: nginx/nginx-prometheus-exporter:0.9.0
+    image: nginx/nginx-prometheus-exporter:1.0
     container_name: prometheus-nginx-exporter
     restart: always
     env_file:
       .env
     command:
-      - -nginx.scrape-uri=http://${DOCKER_BRIDGE_IP_ADDRESS}:8080/stub_status
+      - -nginx.scrape-uri=https://nginx/stub_status
     expose: 
       - 9113
     networks:
@@ -51,7 +50,7 @@ services:
   # source https://github.com/prometheus/node_exporter  
   # https://github.com/vegasbrianc/prometheus/
   prometheus-node-exporter:
-    image: prom/node-exporter:v1.2.2
+    image: prom/node-exporter:v1.7.0
     container_name: prometheus-node-exporter
     restart: always
     volumes:
@@ -73,7 +72,7 @@ services:
 
   # source https://grafana.com/docs/grafana/latest/installation/docker/
   grafana:
-    image: grafana/grafana:8.1.5
+    image: grafana/grafana:10.0.10
     container_name: grafana
     user: '472:0'
     restart: always
@@ -93,16 +92,17 @@ services:
   
   # source: https://github.com/google/cadvisor 
   cadvisor:
-    image: google/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor:v0.47.2
     container_name: cadvisor
     restart: always
     depends_on:
       - prometheus
     volumes:
       - /:/rootfs:ro
-      - /var/run:/var/run:rw
+      - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
     expose:
       - 8080
     networks:
