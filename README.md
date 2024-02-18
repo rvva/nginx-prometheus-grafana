@@ -16,16 +16,11 @@ It's a simple example, template of usage stack Nginx, Prometheus (Node Exporter,
 2. Create Prometheus and Grafana data directory:
 <pre>mkdir -p nginx-prometheus-grafana/{prometheus,grafana}/data
 mkdir nginx-prometheus-grafana/nginx/log</pre>
-3. Change files permissions:
-<pre>
-sudo chown 472:0 -Rc nginx-prometheus-grafana/grafana/data
-sudo chown -Rc 65534:65534 nginx-prometheus-grafana/prometheus/data
-</pre>
-4. Configure .env file 
+3. Configure .env file 
 
 Modify <i>GF_SECURITY_ADMIN</i> parameters to set your personal Grafana credentials. 
 
-5. Run it!
+4. Run it!
 <pre>
 docker-compose up -d
 </pre>

@@ -20,9 +20,9 @@ services:
   # source https://prometheus.io/docs/prometheus/latest/installation/
   prometheus:
     image: prom/prometheus:v2.45.2
+    user: root
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      # chown -Rc 65534:65534 data folder first
       - ./prometheus/data:/prometheus
     container_name: prometheus
     restart: always
@@ -74,12 +74,10 @@ services:
   grafana:
     image: grafana/grafana:10.0.10
     container_name: grafana
-    user: '472:0'
     restart: always
     depends_on:
       - prometheus
     volumes:
-      # chown 472:0 -Rc grafana folder first 
       - ./grafana/data:/var/lib/grafana
     env_file:
       - .env
