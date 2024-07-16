@@ -4,7 +4,6 @@ services:
     build:
       context: ./nginx 
       target: dev
-    image: nginx:1.25.3-alpine3.18
     container_name: nginx-www
     restart: always
     volumes: 
