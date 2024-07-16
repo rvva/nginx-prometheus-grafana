@@ -84,6 +84,7 @@ services:
       - localhost
     ports:
       - 3000:3000
+    user: root
   
   # source: https://github.com/google/cadvisor 
   cadvisor:
